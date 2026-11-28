@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Sen family named links</title>
+<link href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Tiro+Devanagari+Hindi&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday tool for the host
+   IDEA a guest register from the Sen family card: ivory card on maroon
+   PICTURE the list of named links itself, each with its send button
+   COLOUR maroon #5c0f1e ground, ivory #fbf6ec card, maroon #7d1528 actions, gold #c79a3b
+   TYPE Yatra One headings, Tiro Devanagari Hindi text
+   LAYOUT one column card; names box, message, then the list */
+:root{color-scheme:light}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:#5c0f1e radial-gradient(circle at 50% 0,#7a1a2c,#5c0f1e 55%,#430a15) fixed;color:#2b1a14;font:16px/1.55 "Tiro Devanagari Hindi",serif}
+.card{max-width:620px;margin:0 auto;background:#fbf6ec;min-height:100vh;padding:28px max(16px,5%) 40px}
+h1{font:400 clamp(28px,7vw,38px)/1.15 "Yatra One","Tiro Devanagari Hindi",serif;color:#7d1528;margin:0 0 4px}
+.sub{color:#6b5446;margin:0 0 18px}
+label{display:block;font-weight:600;margin:16px 0 6px}
+textarea{width:100%;min-height:140px;font:16px "Tiro Devanagari Hindi",serif;padding:10px 12px;border-radius:12px;border:1.5px solid #7d152855;background:#fff}
+textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #f29b1d;outline-offset:2px}
+.hint{font-size:14px;color:#6b5446;margin:4px 0 0}
+ul{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:10px}
+li{background:#f4ead8;border:1px solid #c79a3b66;border-radius:14px;padding:12px}
+li b{display:block;font:400 22px/1.2 "Yatra One","Tiro Devanagari Hindi",serif;color:#7d1528}
+li code{display:block;font-size:13px;color:#6b5446;overflow-wrap:anywhere;margin:4px 0 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border-radius:999px;border:1.5px solid #7d1528;background:#fff;color:#7d1528;font:16px "Tiro Devanagari Hindi",serif;text-decoration:none;cursor:pointer}
+.btn.fill{background:#7d1528;color:#fff8ec}
+.empty{color:#6b5446;text-align:center;padding:18px;border:1.5px dashed #c79a3b;border-radius:14px}
+.ok{color:#7d1528;font-size:14px;min-height:1.4em}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>मेहमानों के नाम वाले लिंक · सेन परिवार</h1>
+  <p class="sub">Type one guest per line. Each link opens the invite with that guest's name on the cover. This page is for the family only; don't share it.</p>
+  <label for="names">मेहमानों के नाम <span style="font-weight:400">(one per line)</span></label>
+  <textarea id="names">शर्मा जी
+Ramesh Uncle
+सुनीता बुआ जी</textarea>
+  <p class="hint">Example names are filled in. Replace them with your own list.</p>
+  <label for="msg">संदेश <span style="font-weight:400">(sent with each link)</span></label>
+  <textarea id="msg" style="min-height:96px">🙏 जय राघौजी 🙏
+{नाम}, गौरव संग कामिनी के शुभ विवाह (7–11 दिसम्बर 2026) में आप सपरिवार सादर आमंत्रित हैं।
+— सेन परिवार, राघौगढ़
+आपका निमंत्रण पत्र 👇</textarea>
+  <p class="hint">{नाम} is replaced with each guest's name. The link is added at the end.</p>
+  <p class="ok" id="ok" aria-live="polite"></p>
+  <ul id="list"></ul>
+</main>
+<script>
+{
+const BASE='https://yogi26787.github.io/gaurav-kamini-wedding/';
+const names=document.getElementById('names'),msg=document.getElementById('msg'),list=document.getElementById('list'),ok=document.getElementById('ok');
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+try{const n=localStorage.getItem('sen_names'),m=localStorage.getItem('sen_msg');if(n!==null)names.value=n;if(m!==null)msg.value=m}catch(e){}
+function render(){
+  try{localStorage.setItem('sen_names',names.value);localStorage.setItem('sen_msg',msg.value)}catch(e){}
+  const ns=[...new Set(names.value.split('\n').map(s=>s.trim()).filter(Boolean))];
+  if(!ns.length){list.innerHTML='<li class="empty">Add a guest name above to make a link.</li>';return}
+  list.innerHTML=ns.map((n,i)=>{const link=BASE+'?to='+encodeURIComponent(n);const text=msg.value.split('{नाम}').join(n)+'\n'+link;
+    return `<li><b>${esc(n)}</b><code>${esc(link)}</code><div class="row"><a class="btn fill" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">WhatsApp पर भेजें</a><button class="btn" type="button" data-i="${i}">लिंक कॉपी करें</button><a class="btn" href="${esc(link)}" target="_blank" rel="noopener">देखें</a></div></li>`}).join('');
+  list.dataset.links=JSON.stringify(ns.map(n=>BASE+'?to='+encodeURIComponent(n)));
+}
+names.addEventListener('input',render);msg.addEventListener('input',render);
+list.addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(!b)return;const l=JSON.parse(list.dataset.links)[+b.dataset.i];
+  const done=()=>{ok.textContent='Copied: '+l};try{navigator.clipboard.writeText(l).then(done,()=>{ok.textContent=l})}catch(err){ok.textContent=l}});
+render();
+}
+</script>
+</body>
+</html>
